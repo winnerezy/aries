@@ -1,0 +1,11 @@
+:root {
+    --primary-bg: #fefefe;
+    --primary-text: #0A0A0A;
+    --secondary-bg: #ffffff;
+    --secondary-text: #4482ff;
+    --selection-bg: #ccddff;
+    --selection-text: #212121;
+    --border-bg: #6070ff;
+    --border-bg-2: #8aabff;
+    --loader-bg: #6070ff;
+}
