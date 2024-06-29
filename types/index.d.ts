@@ -32,3 +32,15 @@ declare type Button =  {
     title: string
     redirect: string
 }
+
+declare type Message = {
+    sender: string
+    receiver: string
+    content: string
+    createdAt: string
+}
+  
+declare type User = {
+    userId: string
+    username: string
+}

@@ -7,7 +7,7 @@ export const Bottombar = async() => {
 
     const user = await currentUser()
   return (
-    <div className="z-20 w-full h-12 border-t-2 border-[--border-bg-2] md:hidden flex fixed bottom-0 px-8 items-center justify-between bg-[--secondary-bg]">
+    <div className="z-20 w-full h-14 border-t-2 border-[--border-bg-2] md:hidden flex fixed bottom-0 px-8 items-center justify-between bg-[--secondary-bg]">
         <Link href={'/discover'}><FaRegCompass className="size-6"/></Link>
         <Link href={'/messages'}><IoChatbubblesOutline className="size-6"/></Link>
         <Link href={`/profile/${user?.username}`}><RxAvatar className="size-6"/></Link>

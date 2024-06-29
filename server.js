@@ -1,6 +1,7 @@
 import { createServer } from "node:http";
 import next from "next";
 import { Server } from "socket.io";
+import { redis } from "./lib/redis.js";
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = "localhost";
@@ -9,37 +10,68 @@ const port = 3000;
 const app = next({ dev, hostname, port });
 const handler = app.getRequestHandler();
 
-const connectedUsers = []
+const connectedUsers = new Map() // using a map to store the connected user sockets
 
 app.prepare().then(() => {
   const httpServer = createServer(handler);
 
-  const io = new Server(httpServer);
+  const io = new Server(httpServer, {
+    cors: {
+      origin: ["https://aries-three.vercel.app"],
+      methods: ["GET", "POST"]
+    }
+    }
+);
+  
 
   io.on("connection", (socket) => {
-    console.log('connected on', socket.id);
   
     socket.on('register', (userId) => {
       socket.userId = userId;
 
-      connectedUsers.push(socket)
+      connectedUsers.set(userId, socket)
+
+      io.emit('status', 'Online');
     });
   
-    socket.on('chat', (message) => {
-      const { sender, receiver, content } = message;
+    socket.on('chat', async(data) => {
+      const { sender, receiver, content } = data;
   
-      const receiverSocket = connectedUsers.find(socket => socket.userId === receiver);
+      const receiverSocket = connectedUsers.get(receiver)
 
-      if (receiverSocket) {
-        io.to(receiverSocket.id).emit('chat', { sender, content, receiver });
-        io.to(socket.id).emit('chat', { sender, content, receiver });
-      } else {
-        console.log(`User ${receiver} is not connected`);
-
-        io.to(socket.id).emit('chat', { sender, content: `User ${receiver} is offline.` });
+      const message = {
+        sender,
+        receiver,
+        content,
+        createdAt: new Date().toISOString()
       }
-    });
+      // const message = await prisma.message.create({
+      //   data: {
+      //     senderId: sender,
+      //     receiverId: receiver,
+      //     message: content
+      //   }
+      // })
+      
+      if (receiverSocket) {
+        io.to(receiverSocket.id).emit('chat', data);
+        io.to(socket.id).emit('chat', data);
+        
+        await redis.lpush(`messages:${sender}:${receiver}`, JSON.stringify(message));
+        await redis.lpush(`messages:${receiver}:${sender}`, JSON.stringify(message));
+        
+      } else {
+        io.emit('status', 'Offline');
+      }
+      socket.on('disconnect', () => {
+        if (socket.userId) {
+          connectedUsers.delete(socket.userId)
+  
+          io.emit('status', 'Offline');
+        }
+      });
   });
+});
 
   httpServer
     .once("error", (err) => {
