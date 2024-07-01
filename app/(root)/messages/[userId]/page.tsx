@@ -66,15 +66,17 @@ export default function PrivateMessage({ params: { userId } }: { params: { userI
       setMessages((prevMessages) => [...prevMessages, message]);
     });
 
-    socket.on('status', (status) => {
-      setUserStatus(status);
+    socket.on('status', (online: { userId: string, status: string }[]) => {
+      const receiverStatus = online.find(user => user.userId === userId) // getting the receiver from the array
+        setUserStatus(receiverStatus?.status!);
     });
+
 
     return () => {
       socket.off('chat');
       socket.off('status');
     };
-  }, [user]);
+  }, [user, userId]);
 
   useEffect(() => {
     async function fetchMessages(userId: string) {
