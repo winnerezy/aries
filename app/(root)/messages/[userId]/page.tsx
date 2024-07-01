@@ -66,8 +66,8 @@ export default function PrivateMessage({ params: { userId } }: { params: { userI
       setMessages((prevMessages) => [...prevMessages, message]);
     });
 
-    socket.on('status', (online: { userId: string, status: string }[]) => {
-      const receiverStatus = online.find(user => user.userId === userId) // getting the receiver from the array
+    socket.on('status', (online: { id: string, status: string }[]) => {
+      const receiverStatus = online.find(user => user.id === userId) // getting the receiver from the array
         setUserStatus(receiverStatus?.status!);
     });
 
@@ -177,7 +177,7 @@ export default function PrivateMessage({ params: { userId } }: { params: { userI
           :
           ""
         }
-        <section className='w-full flex items-center px-2 border border-[--border-bg] rounded-[5px] '>
+        <section className='w-full flex items-center px-2 border border-[--border-bg] rounded-[5px] bg-[--secondary-bg]'>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button>

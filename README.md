@@ -15,7 +15,7 @@ Aries is a sleek and modern chat application built with Next.js. Designed for se
 
     Intuitive design for easy navigation and seamless user experience.
 
-- User Status [x]
+- User Status [✓]
 
     See online status and availability of your contacts.
 
@@ -51,7 +51,7 @@ Aries is a sleek and modern chat application built with Next.js. Designed for se
 
     Know when your messages have been read by the recipient.
 
-- Offline Messaging [x]
+- Offline Messaging [✓]
 
     Send messages even when offline; they will be delivered once back online.
 ## Run Locally

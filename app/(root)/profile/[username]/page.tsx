@@ -26,26 +26,35 @@ export default async function Profile({ params: { username } }: { params: { user
   const userIdMatch = userId === user.id
 
   return (
-    <section className='w-full p-2 flex flex-col gap-4'>
-      <div className='flex gap-4 items-center mt-8'>
-        <Avatar className="border border-[--border-bg] flex items-center justify-center size-24">
-          <AvatarImage src="" />
-          <AvatarFallback className="font-semibold">{user.username[0].toUpperCase()}</AvatarFallback>
-        </Avatar>
-        <div>
-          <p className='text-md text-[--secondary-text]'>{` ${ user?.firstname } ${ user?.lastname }` }</p>
-          <p className='text-xs'>@{ user?.username }</p>
-        </div>
+    <section className='w-full p-2 flex justify-center items-start'>
+      <main className='w-full max-w-[500px] flex flex-col gap-4 min-h-screen'>
+        <div className='flex gap-8 items-center mt-8'>
+          <Avatar className="border border-[--border-bg] flex items-center justify-center size-24">
+            <AvatarImage src="" />
+            <AvatarFallback className="font-semibold">{user.username[0].toUpperCase()}</AvatarFallback>
+          </Avatar>
+          <div className='flex flex-col justify-start'>
+            <p className='text-md text-[--secondary-text] w-max'>{` ${ user?.firstname } ${ user?.lastname }` }</p>
+            <p className='text-xs'>@{ user?.username }</p>
+            <span className='text-sm'>
+              0 Friends
+            </span>
+          </div>
+          </div>
 
-      <section>
-        { 
-          userIdMatch ?
-          <CustomButton title='Edit Profile' redirect='edit-profile'/>
-          :
-          <CustomButton title='Message' redirect = {`/messages/${user.id}`}/>
-        }
-      </section>
-      </div>
+        <section className='flex gap-4 text-md items-center w-full'>
+
+
+          <section>
+            { 
+              userIdMatch ?
+              <CustomButton title='Edit Profile' redirect='edit-profile'/>
+              :
+              <CustomButton title='Message' redirect = {`/messages/${user.id}`}/>
+            }
+          </section>
+        </section>
+      </main>
     </section>
   )
 }
