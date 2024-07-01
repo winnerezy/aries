@@ -22,6 +22,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "server.js", "lib/constants.ts", "lib/redis.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "socket-server/server.js", "lib/constants.ts", "lib/redis.js", "utils/cloudinary.js"],
   "exclude": ["node_modules"]
 }

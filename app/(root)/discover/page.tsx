@@ -1,5 +1,4 @@
 import { Search } from "@/components/Search";
-import { PrismaClient } from '@prisma/client'
 
 export default function Discover() {
 

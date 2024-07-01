@@ -20,11 +20,10 @@ model User {
   role String @default("User")
 }
 
-model Message {
+model Conversation {
   id String @id @default(auto()) @map("_id") @db.ObjectId
-  senderId String
-  receiverId String
-  message String
+  senderId String @db.ObjectId()
+  receiverId String @db.ObjectId()
   createdAt DateTime @default(now())
 }
 

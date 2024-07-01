@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Roboto } from "next/font/google";
 import "../globals.css";
 import { Sidebar } from "@/components/Sidebar";
 import { Bottombar } from "@/components/Bottombar";
 
-// const roboto = Roboto({
-//   weight: ['400', '700'],
-//   style: ['normal', 'italic'],
-//   subsets: ['latin'],
-//   display: 'swap',
-// })
+const roboto = Roboto({
+  weight: ['400', '700'],
+  style: ['normal', 'italic'],
+  subsets: ['latin'],
+  display: 'swap',
+})
 
 const inter = Inter({ subsets: ["latin"] });
 

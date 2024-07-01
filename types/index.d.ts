@@ -37,10 +37,17 @@ declare type Message = {
     sender: string
     receiver: string
     content: string
+    photo: string | null
     createdAt: string
 }
   
 declare type User = {
     userId: string
     username: string
+}
+
+declare type Conversation = {
+    senderId: string
+    receiverId: string,
+    createdAt: Date
 }

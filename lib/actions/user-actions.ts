@@ -3,7 +3,8 @@ import { prisma } from "@/lib/constants"
 import { headers } from "next/headers"
 
 export const fetchUsers = async (username: string) => {
-    const user = await prisma.user.findMany({
+    try {
+      const user = await prisma.user.findMany({
         where: {
             username
         },
@@ -14,10 +15,15 @@ export const fetchUsers = async (username: string) => {
             avatar: true
         }
     })
-    return user
+      return user
+    } catch (error: any) {
+      console.log(error.message)
+      return null
+    }
 }
 
 export const currentUser = async () => {
+  try {
     const userId = headers().get('userId') as string
     const user = await prisma.user.findUnique({
       where: {
@@ -30,5 +36,9 @@ export const currentUser = async () => {
         username: true
       }
     })
-  return user
+    return user
+  } catch (error: any) {
+    console.log(error.message)
+    return null
+  }
 }

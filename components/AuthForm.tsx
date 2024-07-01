@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from "./ui/form";
 import AuthButton from "./AuthButton";
-import { authFormSchema } from "../lib/utils/authFormSchema";
+import { authFormSchema } from "../utils/authFormSchema";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Input } from "./ui/input";
@@ -44,7 +44,6 @@ export default function AuthForm({ type }: { type: string }) {
                 if(res.status === 200){
                   router.push("/discover");
                 }
-                console.log(message)
                 setError(message)
         } catch (error: any) {
             setError(error.message)

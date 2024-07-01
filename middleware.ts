@@ -23,6 +23,7 @@ export const middleware = async (req: NextRequest) => {
     }
 
     res.headers.set('userId', verify?.payload.sub as string)
+
     return res
 }
 
