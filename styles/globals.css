@@ -14,9 +14,9 @@
     color: var(--selection-text);
   }
 
-  .user-circle {
+  /* .user-circle {
     display: grid;
     gap: 10px;
     grid-template-columns: repeat(auto-fill, minmax(3rem, 1fr));
     grid-template-rows: auto;
-  }
+  } */

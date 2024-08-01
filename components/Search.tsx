@@ -7,7 +7,6 @@ import { IoSearch } from "react-icons/io5"
 import { UserCard } from "./UserCard"
 import Link from "next/link"
 import { CircularProgress } from "@mui/material"
-import { loadBindings } from "next/dist/build/swc"
 
 export const Search = () => {
 
@@ -29,17 +28,18 @@ export const Search = () => {
           const users = await fetchUsers(search)
           setUsers(users)
           setIsLoading(false)
+        } else {
+          setUsers([])
         }
       }
       fetch()
     }, [search])
     
   return (
-    <section className="flex flex-col gap-4 items-center justify-center">
-        <div className="flex flex-col gap-2 items-center w-full max-w-[500px]">
-            <h1 className="text-3xl text-start w-full font-bold tracking-wide text-[--secondary-text]">Discover</h1>
-            <div className="w-full h-8 rounded-[5px] p-2 flex items-center divide-x-2 gap-3 border border-[--border-bg]">
-              <IoSearch className="size-5 text-[--secondary-text]"/>
+    <section className="flex flex-col gap-4 items-center justify-center w-full">
+        <div className="flex flex-col gap-2 items-center w-full">
+            <div className="w-full h-10 rounded-[5px] p-2 flex items-center gap-3 border border-[--border-bg]">
+              <IoSearch className="size-5 text-[--icon-bg]"/>
               <input 
               type="search" 
               className="w-full text-sm font-light outline-none placeholder:text-xs bg-transparent"

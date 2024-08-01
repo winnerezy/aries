@@ -11,7 +11,6 @@ export const POST = async (req: NextRequest) => {
         data.password = hashedPassword
         const user = await prisma.user.create({ data })
         await createSession(user.id)
-        console.log(user)
         return new NextResponse(JSON.stringify(user))
     } catch (error: any) {
         console.log(error.message)

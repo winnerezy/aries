@@ -5,7 +5,7 @@ import { Button } from "./ui/button";
 import CircularProgress from '@mui/material/CircularProgress';
 
 export default function AuthButton({ type, isLoading }: CustomButton) {
-  console.log(isLoading)
+
   return (
     <Button
       type="submit"

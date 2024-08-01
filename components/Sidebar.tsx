@@ -8,7 +8,7 @@ export const Sidebar = async() => {
 
     const user = await currentUser()
   return (
-    <aside className="hidden md:flex items-start justify-center border-r-2 w-[80px] min-h-screen">
+    <aside className="hidden md:flex items-start justify-center border-r-2 w-[80px] min-h-screen bg-[--primary2-bg]">
         <div className="flex flex-col items-center justify-center gap-14 mt-[200px]">
             <Link href={'/discover'}><FaRegCompass className="size-6"/></Link>
             <Link href={'/messages'}><IoChatbubblesOutline className="size-6"/></Link>

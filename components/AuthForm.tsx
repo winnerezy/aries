@@ -17,11 +17,13 @@ import { authFormSchema } from "../utils/authFormSchema";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Input } from "./ui/input";
+import { socket } from "@/app/socket";
+import { User } from "@/types";
 
 export default function AuthForm({ type }: { type: string }) {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
   const formSchema = authFormSchema(type);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -40,11 +42,12 @@ export default function AuthForm({ type }: { type: string }) {
                    
                   };
                   const res = await fetch('api/login', options)
-                  const { message } = await res.json()
+                  const ans = await res.json()
+                  socket.emit("register", ans.id)
                 if(res.status === 200){
                   router.push("/discover");
                 }
-                setError(message)
+                setError(ans.message)
         } catch (error: any) {
             setError(error.message)
         } finally {
@@ -65,6 +68,8 @@ export default function AuthForm({ type }: { type: string }) {
             }
            )
            const res = await fetch('/api/register', { method: 'POST', body })
+           const ans = await res.json()
+           socket.emit("register", ans.id)
           if(res.status === 200){
             router.push("/discover");
           }
@@ -106,7 +111,7 @@ export default function AuthForm({ type }: { type: string }) {
                           <Input
                             placeholder="Enter your first name"
                             {...field}
-                            className={`p-2 rounded-[10px] w-full flex-grow outline-none text-black`}
+                            className={`p-2 rounded-[10px] w-full flex-grow outline-none border border-[--border-bg]`}
                           />
                         </FormControl>
                         <FormMessage />
@@ -124,7 +129,7 @@ export default function AuthForm({ type }: { type: string }) {
                           <Input
                             placeholder="Enter your last name"
                             {...field}
-                            className={`p-2 rounded-[10px] w-full flex-grow outline-none text-black`}
+                            className={`p-2 rounded-[10px] w-full flex-grow outline-none border border-[--border-bg]`}
                           />
                         </FormControl>
                         <FormMessage />
@@ -143,7 +148,7 @@ export default function AuthForm({ type }: { type: string }) {
                         <Input
                           placeholder="Enter your username"
                           {...field}
-                          className={`p-2 rounded-[10px] w-full flex-grow outline-none text-black`}
+                          className={`p-2 rounded-[10px] w-full flex-grow outline-none border border-[--border-bg]`}
                         />
                       </FormControl>
                       <FormMessage />
@@ -161,7 +166,7 @@ export default function AuthForm({ type }: { type: string }) {
                         <Input
                           placeholder="Enter your email address"
                           {...field}
-                          className={`p-2 rounded-[10px] w-full flex-grow outline-none`}
+                          className={`p-2 rounded-[10px] w-full flex-grow outline-none border border-[--border-bg]`}
                         />
                       </FormControl>
                       <FormMessage />
@@ -179,7 +184,7 @@ export default function AuthForm({ type }: { type: string }) {
                         <Input
                           placeholder="Enter your password"
                           {...field}
-                          className={`p-2 rounded-[10px] w-full flex-grow outline-none`}
+                          className={`p-2 rounded-[10px] w-full flex-grow outline-none border border-[--border-bg]`}
                         />
                       </FormControl>
                       <FormMessage />
@@ -199,7 +204,7 @@ export default function AuthForm({ type }: { type: string }) {
                         <Input
                           placeholder="Enter your username"
                           {...field}
-                          className={`p-2 rounded-[10px] w-full flex-grow outline-none`}
+                          className={`p-2 rounded-[10px] w-full flex-grow outline-none border border-[--border-bg]`}
                         />
                       </FormControl>
                       <FormMessage />
@@ -218,7 +223,7 @@ export default function AuthForm({ type }: { type: string }) {
                           placeholder="Enter your password"
                           type="password"
                           {...field}
-                          className={`p-2 rounded-[10px] w-full flex-grow outline-none`}
+                          className={`p-2 rounded-[10px] w-full flex-grow outline-none border border-[--border-bg]`}
                         />
                       </FormControl>
                       <FormMessage />

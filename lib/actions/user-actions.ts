@@ -6,7 +6,9 @@ export const fetchUsers = async (username: string) => {
     try {
       const user = await prisma.user.findMany({
         where: {
-            username
+            username: {
+              contains: username
+            }
         },
         select: {
             firstname: true,

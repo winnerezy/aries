@@ -54,6 +54,15 @@ Aries is a sleek and modern chat application built with Next.js. Designed for se
 - Offline Messaging [✓]
 
     Send messages even when offline; they will be delivered once back online.
+
+- Recent messages page [x]
+
+    A collectiono of previous chats that the users can access and delete.
+
+- Add Friends [x]
+
+    Send friend request and be a friend to be able to chat with users.
+
 ## Run Locally
 
 Clone the project

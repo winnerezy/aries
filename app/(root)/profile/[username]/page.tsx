@@ -3,10 +3,12 @@ import { prisma } from '@/lib/constants'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { Avatar, AvatarFallback, AvatarImage } from "../../../../components/ui/avatar"
+import { FriendButton } from '@/components/FriendButton'
 
 export default async function Profile({ params: { username } }: { params: { username: string } }) {
 
   const userId = headers().get('userId') as string
+
   const user = await prisma.user.findUnique({
     where: {
       username: username
@@ -15,7 +17,19 @@ export default async function Profile({ params: { username } }: { params: { user
       id: true,
       firstname: true,
       lastname: true,
-      username: true
+      username: true,
+      friends: true,
+      friendRequests: true
+    }
+  })
+
+  const currentUser = await prisma.user.findUnique({
+    where: {
+      id: userId
+    },
+    select: {
+      friends: true,
+      friendRequests: true
     }
   })
 
@@ -37,7 +51,7 @@ export default async function Profile({ params: { username } }: { params: { user
             <p className='text-md text-[--secondary-text] w-max'>{` ${ user?.firstname } ${ user?.lastname }` }</p>
             <p className='text-xs'>@{ user?.username }</p>
             <span className='text-sm'>
-              0 Friends
+              { `${user.friends.length} Friends` }
             </span>
           </div>
           </div>
@@ -48,9 +62,20 @@ export default async function Profile({ params: { username } }: { params: { user
           <section>
             { 
               userIdMatch ?
-              <CustomButton title='Edit Profile' redirect='edit-profile'/>
+              <>
+                <CustomButton title='Edit Profile' redirect='edit-profile'/>
+              </>
               :
-              <CustomButton title='Message' redirect = {`/messages/${user.id}`}/>
+              <>
+               {
+                user.friends.includes(userId) && currentUser?.friends.includes(user.id) ?
+                <>
+                  <CustomButton title='Message' redirect = {`/messages/${user.id}`}/>
+                </>
+                :
+                <FriendButton sender={userId} receiver={user.id} friendRequests={user.friendRequests} friends={user.friends}/>
+                }
+              </>
             }
           </section>
         </section>

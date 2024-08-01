@@ -1,3 +1,9 @@
 import { io } from "socket.io-client";
 
-export const socket = io('https://aries-socket.onrender.com');
+export const socket = io('http://localhost:3001', {
+    autoConnect: true,
+    reconnectionAttempts: 5,
+    reconnection: true
+});
+
+// 

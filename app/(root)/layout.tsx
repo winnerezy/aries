@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Roboto } from "next/font/google";
-import "../globals.css";
+import "../../styles/globals.css";
 import { Sidebar } from "@/components/Sidebar";
 import { Bottombar } from "@/components/Bottombar";
 
@@ -23,10 +23,11 @@ export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
+
 }>) {
   return (
        <>
-        <main className="w-full flex sm:mb-0 mb-12">
+        <main className="w-full flex sm:mb-0 mb-14">
           <Sidebar/>
           {children}
         </main>

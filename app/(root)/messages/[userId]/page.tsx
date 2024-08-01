@@ -1,16 +1,16 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
 import { IoImageSharp, IoSendSharp } from 'react-icons/io5';
 import { socket } from '@/app/socket';
 import { ChatBubble } from '@/components/ChatBubble';
 import { FaPlus, FaVideo } from 'react-icons/fa6';
 import { Message, User } from '@/types';
-import { Avatar, AvatarFallback, AvatarImage } from '../../../../components/ui/avatar';
-import Link from 'next/link';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useDropzone } from 'react-dropzone';
 import Image from 'next/image';
+import Loading from './loading';
+import { ChatHeader } from '@/components/ChatHeader';
 
 export default function PrivateMessage({ params: { userId } }: { params: { userId: string } }) {
   const [message, setMessage] = useState('');
@@ -18,8 +18,9 @@ export default function PrivateMessage({ params: { userId } }: { params: { userI
   const [fetchedMessages, setFetchedMessages] = useState<Message[]>([]);
   const [user, setUser] = useState<string>('');
   const [userStatus, setUserStatus] = useState<string>('');
-  const [receiver, setReceiver] = useState<User | null>(null);
-
+  const [receiver, setReceiver] = useState<User | undefined>(undefined);
+  const [userTyping, setUserTyping] = useState<string | null>(null);
+  
   const chatBoxRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -99,12 +100,31 @@ export default function PrivateMessage({ params: { userId } }: { params: { userI
 
   const handleMessage = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);
+    if (e.target.value !== '') {
+      socket.emit('typing', { user, userId, typing: true });
+    } else {
+      socket.emit('stop typing', { user, userId });
+    }
+    
   };
 
+  useEffect(()=> {
+    socket.on('is typing', (message) => {
+      setUserTyping(message)
+    })
+    socket.on('stop typing', () => {
+      setUserTyping(null);
+    });
+  }, [])
+
   const sendMessage = async() => {
+    
+    socket.emit('stop typing', { user, userId });
+
     if (message.trim() === '' && !photo) {
       return;
     }
+
     let photoUrl = null;
 
     if(photo){
@@ -144,83 +164,76 @@ export default function PrivateMessage({ params: { userId } }: { params: { userI
 
   return (
     <section className='flex flex-col w-full items-center gap-2'>
-      <header className='w-full h-12 border flex gap-4 items-center'>
-        <Link href={`/profile/${receiver?.username}`}>
-          <Avatar className="border border-[--border-bg] flex items-center justify-center  ml-8">
-            <AvatarImage src="" />
-            <AvatarFallback className="font-semibold">{receiver?.username[0].toUpperCase()}</AvatarFallback>
-          </Avatar>
-        </Link>
-        <p>
-          {receiver?.username && userStatus ? `${receiver?.username} is ${userStatus}` : ""}
-        </p>
-      </header>
+      <section className='flex flex-col w-full max-w-[800px] gap-2'>
+          
+        <ChatHeader receiver={receiver} userStatus={userStatus} typing={userTyping}/>
 
-      <div className="flex flex-col gap-4 w-full max-w-[700px] p-2 h-[550px] overflow-y-auto px-4" ref={chatBoxRef}>
-        {
-          fetchedMessages && fetchedMessages.length !== 0 ?
-            fetchedMessages.map((msg: Message, index) => (
-              <ChatBubble key={index} className={`${msg.receiver === userId ? 'self-end' : 'self-start'}`} {...msg} />
-            ))
+        <div className="flex flex-col gap-4 w-full -z-50 fixed bottom-20 max-w-[700px] p-2 h-[500px] sm:h-[500px] overflow-y-auto px-4" ref={chatBoxRef}>
+          {
+            fetchedMessages && fetchedMessages.length !== 0 ?
+              fetchedMessages.map((msg: Message, index) => (
+                <ChatBubble key={index} className={`${msg.receiver === userId ? 'self-end' : 'self-start'}`} {...msg} />
+              ))
+              :
+              ''
+          }
+          {messages.map((msg: Message, index) => (
+            <ChatBubble key={index} className={`${msg.receiver === userId ? 'self-end' : 'self-start'}`} {...msg} />
+          ))}
+        </div>
+
+        <div className='fixed bottom-16 md:bottom-8 z-40 flex flex-col gap-2 items-center p-2 w-full max-w-[700px]'>
+          {
+            photo ?
+            <Image src={photo} alt="" width={300} height={300} className="rounded-md"/>
             :
-            ''
-        }
-        {messages.map((msg: Message, index) => (
-          <ChatBubble key={index} className={`${msg.receiver === userId ? 'self-end' : 'self-start'}`} {...msg} />
-        ))}
-      </div>
-
-      <div className='fixed bottom-16 z-40 flex flex-col gap-2 items-center p-2 w-full max-w-[700px]'>
-        {
-          photo ?
-          <Image src={photo} alt="" width={300} height={300} className="rounded-md"/>
-          :
-          ""
-        }
-        <section className='w-full flex items-center px-2 border border-[--border-bg] rounded-[5px] bg-[--secondary-bg]'>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button>
-                <FaPlus className='rounded-full text-[--secondary-text] size-5' />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 h-24 rounded-[5px] bg-[--secondary-bg] font-light tracking-wide p-2">
-              <DropdownMenuSeparator />
-              <div {...getRootProps()} className='w-full'>
-                <input {...getInputProps()} accept="image/*" />
-                <div className='flex gap-2 items-center hover:opacity-80 cursor-pointer'>
-                  <IoImageSharp />
-                  <p>Upload Image</p>
+            ""
+          }
+          <section className='w-full flex items-center px-2 border border-[--border-bg] rounded-[20px] bg-[--primary4-bg]'>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button>
+                  <FaPlus className='rounded-full text-[--icon-bg] size-5' />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 h-24 rounded-[5px] bg-[--primary2-bg] font-light tracking-wide p-2">
+                <DropdownMenuSeparator />
+                <div {...getRootProps()} className='w-full'>
+                  <input {...getInputProps()} accept="image/*" />
+                  <div className='flex gap-2 items-center hover:opacity-80 cursor-pointer'>
+                    <IoImageSharp />
+                    <p>Upload Image</p>
+                  </div>
                 </div>
-              </div>
-              <DropdownMenuSeparator />
-              <div className='flex gap-2 items-center cursor-pointer'>
-                <FaVideo />
-                <p>Upload Video</p>
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <DropdownMenuSeparator />
+                <div className='flex gap-2 items-center cursor-pointer'>
+                  <FaVideo />
+                  <p>Upload Video</p>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-          <input
-            type="text"
-            className='w-full h-8 outline-none p-2 placeholder:text-xs text-sm font-light'
-            placeholder='Send Message'
-            value={message}
-            onChange={(e) => handleMessage(e)}
-            onKeyDown={(e) => {
-              if (e.code === 'Enter') {
-                sendMessage();
-              }
-            }}
-            ref={inputRef}
-          />
-        <button
-          onClick={sendMessage}
-          className='w-12 h-8 grid place-content-center hover:opacity-80'>
-          <IoSendSharp className='text-[--secondary-text]' />
-        </button>
-        </section>
-      </div>
+            <input
+              type="text"
+              className='w-full h-8 outline-none p-2 placeholder:text-xs text-sm font-light'
+              placeholder='Type Something'
+              value={message}
+              onChange={(e) => handleMessage(e)}
+              onKeyDown={(e) => {
+                if (e.code === 'Enter') {
+                  sendMessage();
+                }
+              }}
+              ref={inputRef}
+            />
+          <button
+            onClick={sendMessage}
+            className='w-12 h-8 grid place-content-center hover:opacity-80'>
+            <IoSendSharp className='text-[--icon-bg]' />
+          </button>
+          </section>
+        </div>
+      </section>
     </section>
   );
 }
